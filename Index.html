@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#152d34">
+  <title>Echoes of Egypt — A Journey Through Ancient Civilization</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --gold: #f2c879;
+      --cream: #f7edda;
+      --ease: cubic-bezier(.2, .75, .25, 1);
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-snap-type: y proximity;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: #152d34;
+      color: var(--cream);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .worlds,
+    .world,
+    .shade {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .worlds {
+      z-index: -2;
+      overflow: hidden;
+      background: #152d34;
+    }
+
+    .world {
+      opacity: 0;
+      transform: scale(1.035);
+      transition: opacity 1.15s var(--ease), transform 2s var(--ease);
+    }
+
+    .world.is-active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .world svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .shade {
+      z-index: -1;
+      background:
+        linear-gradient(90deg, rgba(10, 21, 25, .76) 0%, rgba(10, 21, 25, .48) 47%, rgba(10, 21, 25, .12) 100%),
+        linear-gradient(0deg, rgba(8, 18, 22, .45), transparent 42%);
+    }
+
+    .topbar {
+      position: fixed;
+      z-index: 5;
+      inset: 0 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      padding: 23px clamp(22px, 6vw, 88px);
+      background: linear-gradient(180deg, rgba(10, 18, 20, .58), transparent);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      color: var(--cream);
+      text-decoration: none;
+      font-size: 14px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      width: 27px;
+      height: 27px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(242, 200, 121, .8);
+      color: var(--gold);
+      transform: rotate(45deg);
+      font-size: 13px;
+    }
+
+    .brand-mark span { transform: rotate(-45deg); }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: clamp(14px, 2.7vw, 38px);
+    }
+
+    nav a {
+      color: rgba(247, 237, 218, .76);
+      text-decoration: none;
+      font: 11px/1.3 Arial, sans-serif;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      transition: color .25s ease;
+    }
+
+    nav a:hover,
+    nav a.is-current { color: var(--gold); }
+
+    main { position: relative; }
+
+    .chapter {
+      position: relative;
+      min-height: 100vh;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      padding: 120px clamp(22px, 10vw, 150px) 90px;
+      scroll-snap-align: start;
+      isolation: isolate;
+    }
+
+    .chapter:nth-child(even) { justify-content: flex-end; }
+
+    .chapter-copy {
+      width: min(100%, 590px);
+      padding: clamp(25px, 4vw, 48px);
+      background: linear-gradient(135deg, rgba(10, 24, 28, .74), rgba(10, 24, 28, .28));
+      border-left: 1px solid rgba(242, 200, 121, .72);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      box-shadow: 0 18px 70px rgba(0, 0, 0, .12);
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin: 0 0 21px;
+      color: var(--gold);
+      font: 11px/1.4 Arial, sans-serif;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 29px;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    h1, h2 {
+      margin: 0;
+      font-size: clamp(43px, 7vw, 82px);
+      font-weight: 400;
+      line-height: .98;
+      letter-spacing: -.045em;
+    }
+
+    .chapter-copy p:not(.eyebrow) {
+      max-width: 470px;
+      margin: 25px 0 0;
+      color: rgba(247, 237, 218, .88);
+      font-size: clamp(16px, 1.45vw, 19px);
+      line-height: 1.8;
+    }
+
+    .chapter-index {
+      display: inline-block;
+      margin-top: 31px;
+      color: rgba(247, 237, 218, .59);
+      font: 10px/1.5 Arial, sans-serif;
+      letter-spacing: .19em;
+      text-transform: uppercase;
+    }
+
+    .scroll-cue {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 34px;
+      color: rgba(247, 237, 218, .7);
+      font: 10px/1.4 Arial, sans-serif;
+      letter-spacing: .17em;
+      text-transform: uppercase;
+    }
+
+    .scroll-cue span {
+      width: 1px;
+      height: 35px;
+      background: var(--gold);
+      animation: cue 1.8s ease-in-out infinite;
+      transform-origin: top;
+    }
+
+    @keyframes cue {
+      0%, 100% { transform: scaleY(.65); opacity: .5; }
+      50% { transform: scaleY(1); opacity: 1; }
+    }
+
+    .corner-note {
+      position: fixed;
+      z-index: 4;
+      right: clamp(22px, 6vw, 88px);
+      bottom: 25px;
+      color: rgba(247, 237, 218, .56);
+      font: 9px/1.4 Arial, sans-serif;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      writing-mode: vertical-rl;
+    }
+
+    @media (max-width: 700px) {
+      .topbar { padding: 17px 20px; }
+      .brand { font-size: 11px; letter-spacing: .11em; }
+      .brand-mark { width: 23px; height: 23px; }
+      nav { gap: 12px; }
+      nav a { font-size: 9px; letter-spacing: .08em; }
+
+      .chapter {
+        align-items: flex-end;
+        padding: 120px 20px 75px;
+      }
+
+      .chapter:nth-child(even) { justify-content: flex-start; }
+
+      .chapter-copy {
+        width: 100%;
+        padding: 27px 23px;
+        background: linear-gradient(135deg, rgba(10, 24, 28, .82), rgba(10, 24, 28, .48));
+      }
+
+      .chapter-copy p:not(.eyebrow) { line-height: 1.65; }
+      .corner-note { display: none; }
+
+      .shade {
+        background:
+          linear-gradient(0deg, rgba(8, 18, 22, .81), rgba(8, 18, 22, .2) 78%),
+          linear-gradient(90deg, rgba(10, 21, 25, .25), transparent);
+      }
+    }
+
+    @media (max-width: 410px) {
+      nav { gap: 9px; }
+      nav a { font-size: 8px; }
+      .brand { gap: 8px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="worlds" aria-hidden="true">
+    <div class="world is-active" data-world="nile">
+      <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="nileSky" x2="0" y2="1">
+            <stop stop-color="#6ba5a1"/>
+            <stop offset=".58" stop-color="#e4b77e"/>
+            <stop offset="1" stop-color="#d69a60"/>
+          </linearGradient>
+          <linearGradient id="nileWater" x2="0" y2="1">
+            <stop stop-color="#477f77"/>
+            <stop offset="1" stop-color="#153f43"/>
+          </linearGradient>
+        </defs>
+        <rect width="1440" height="900" fill="url(#nileSky)"/>
+        <circle cx="1120" cy="210" r="78" fill="#f9d28d" opacity=".92"/>
+        <path d="M0 510 Q250 360 490 493 T975 450 T1440 475 V900 H0Z" fill="#b7794f" opacity=".72"/>
+        <path d="M0 570 Q250 482 480 570 T900 550 T1440 555 V900 H0Z" fill="#c8915d"/>
+        <path d="M0 632 Q220 581 455 645 Q690 705 915 634 Q1170 553 1440 630 V900 H0Z" fill="url(#nileWater)"/>
+        <path d="M0 690 Q245 649 480 710 T940 694 T1440 703" fill="none" stroke="#b8cba1" stroke-width="5" opacity=".38"/>
+        <path d="M0 754 Q245 710 480 770 T940 750 T1440 765" fill="none" stroke="#b8cba1" stroke-width="3" opacity=".24"/>
+        <g fill="#183d35">
+          <path d="M92 642 Q99 545 87 472 Q118 534 117 621Z"/>
+          <path d="M103 526 Q38 494 24 447 Q78 461 108 501 Q79 445 87 402 Q121 454 120 504 Q137 448 175 426 Q169 476 118 523Z"/>
+          <path d="M1285 633 Q1297 535 1284 461 Q1317 529 1315 626Z"/>
+          <path d="M1301 518 Q1235 484 1223 438 Q1274 449 1307 491 Q1278 436 1288 394 Q1320 449 1318 492 Q1340 440 1377 420 Q1368 472 1318 514Z"/>
+        </g>
+        <g stroke="#e5c485" stroke-width="3" opacity=".68">
+          <path d="M237 664q-10-95 7-147m0 70q-38-31-44-67m44 47q30-39 37-68"/>
+          <path d="M275 666q-3-65 12-103m-10 58q-24-23-27-47m31 31q23-25 29-48"/>
+          <path d="M1161 657q-12-73 0-116m-1 58q-30-24-34-51m36 40q22-27 29-52"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="world" data-world="pyramids">
+      <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="pyramidSky" x2="0" y2="1">
+            <stop stop-color="#bd8061"/>
+            <stop offset=".57" stop-color="#e6ae73"/>
+            <stop offset="1" stop-color="#f0ca88"/>
+          </linearGradient>
+          <linearGradient id="pyramidSand" x2="0" y2="1">
+            <stop stop-color="#d49a5b"/>
+            <stop offset="1" stop-color="#8c583d"/>
+          </linearGradient>
+        </defs>
+        <rect width="1440" height="900" fill="url(#pyramidSky)"/>
+        <circle cx="1095" cy="197" r="88" fill="#ffe0a0" opacity=".88"/>
+        <path d="M0 540 Q290 435 570 510 T1110 493 T1440 475 V900 H0Z" fill="#c78b59"/>
+        <path d="M0 680 Q260 570 470 644 T930 623 T1440 660 V900 H0Z" fill="url(#pyramidSand)"/>
+        <path d="M340 675 585 260 833 675Z" fill="#75503c"/>
+        <path d="M585 260 833 675 568 675Z" fill="#a8754f"/>
+        <path d="M795 677 927 454 1061 677Z" fill="#8c6046"/>
+        <path d="M927 454 1061 677 912 677Z" fill="#b07d53"/>
+        <path d="M70 758 Q390 695 689 753 T1440 727" fill="none" stroke="#f2c481" stroke-width="5" opacity=".45"/>
+        <path d="M0 824 Q355 766 674 819 T1440 790" fill="none" stroke="#efc17f" stroke-width="3" opacity=".34"/>
+        <g fill="#573e32" opacity=".7">
+          <path d="M1140 727h27v65h-27zM1180 716h34v76h-34zM1230 738h25v54h-25z"/>
+          <path d="M1132 720h101v10h-101z"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="world" data-world="temple">
+      <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="templeSky" x2="0" y2="1">
+            <stop stop-color="#292d49"/>
+            <stop offset=".62" stop-color="#786050"/>
+            <stop offset="1" stop-color="#c18a59"/>
+          </linearGradient>
+          <linearGradient id="templeStone" x2="0" y2="1">
+            <stop stop-color="#d6ad70"/>
+            <stop offset="1" stop-color="#806148"/>
+          </linearGradient>
+        </defs>
+        <rect width="1440" height="900" fill="url(#templeSky)"/>
+        <circle cx="1160" cy="155" r="47" fill="#f2d59b" opacity=".85"/>
+        <g fill="#fbe5b5" opacity=".55">
+          <circle cx="190" cy="145" r="2"/>
+          <circle cx="350" cy="90" r="2"/>
+          <circle cx="805" cy="124" r="2"/>
+          <circle cx="950" cy="215" r="2"/>
+          <circle cx="1302" cy="300" r="2"/>
+          <circle cx="690" cy="205" r="2"/>
+          <circle cx="455" cy="195" r="2"/>
+        </g>
+        <path d="M0 575 Q340 526 700 574 T1440 550 V900 H0Z" fill="#66503f"/>
+        <g fill="url(#templeStone)" stroke="#72543e" stroke-width="5">
+          <path d="M160 376h1120v62H160z"/>
+          <path d="M205 438h1030v330H205z"/>
+          <path d="M125 356h1190l-75-70H200z"/>
+          <path d="M150 770h1140v46H150z"/>
+        </g>
+        <g fill="#725640">
+          <path d="M252 444h76v325h-76z"/>
+          <path d="M395 444h76v325h-76z"/>
+          <path d="M538 444h76v325h-76z"/>
+          <path d="M826 444h76v325h-76z"/>
+          <path d="M969 444h76v325h-76z"/>
+          <path d="M1112 444h76v325h-76z"/>
+        </g>
+        <g fill="#d0a46a">
+          <path d="M236 434h108v27H236z"/>
+          <path d="M379 434h108v27H379z"/>
+          <path d="M522 434h108v27H522z"/>
+          <path d="M810 434h108v27H810z"/>
+          <path d="M953 434h108v27H953z"/>
+          <path d="M1096 434h108v27h-108z"/>
+        </g>
+        <g fill="#d5b879" opacity=".9">
+          <path d="M685 760V650h70v110z"/>
+          <path d="M676 652l44-78 44 78z"/>
+        </g>
+        <g stroke="#d7b678" stroke-width="5" opacity=".7">
+          <path d="M226 491h22v18h-22zm0 43h22v18h-22zm0 43h22v18h-22z"/>
+          <path d="M1200 490h22v18h-22zm0 43h22v18h-22zm0 43h22v18h-22z"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="world" data-world="afterlife">
+      <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="afterSky" x2="0" y2="1">
+            <stop stop-color="#102b3b"/>
+            <stop offset=".64" stop-color="#23444b"/>
+            <stop offset="1" stop-color="#77533f"/>
+          </linearGradient>
+          <linearGradient id="portal" x2="0" y2="1">
+            <stop stop-color="#f8d68e"/>
+            <stop offset="1" stop-color="#bf8450"/>
+          </linearGradient>
+        </defs>
+        <rect width="1440" height="900" fill="url(#afterSky)"/>
+        <g fill="#f8dfaa" opacity=".72">
+          <circle cx="150" cy="128" r="2"/>
+          <circle cx="286" cy="240" r="2"/>
+          <circle cx="470" cy="115" r="2"/>
+          <circle cx="775" cy="171" r="2"/>
+          <circle cx="1020" cy="107" r="2"/>
+          <circle cx="1255" cy="227" r="2"/>
+          <circle cx="1375" cy="116" r="2"/>
+          <circle cx="890" cy="290" r="2"/>
+          <circle cx="344" cy="380" r="2"/>
+        </g>
+        <circle cx="1110" cy="240" r="94" fill="#eacb91" opacity=".85"/>
+        <circle cx="1147" cy="215" r="94" fill="#173542"/>
+        <path d="M0 626 Q280 552 550 631 T1050 602 T1440 618 V900 H0Z" fill="#415147"/>
+        <path d="M0 746 Q300 660 585 738 T1120 710 T1440 731 V900 H0Z" fill="#263d3a"/>
+        <g>
+          <path d="M492 786V490Q492 330 720 330Q948 330 948 490V786Z" fill="#b98756"/>
+          <path d="M548 786V500Q548 382 720 382Q892 382 892 500V786Z" fill="url(#portal)"/>
+          <path d="M612 786V530Q612 439 720 439Q828 439 828 530V786Z" fill="#294449"/>
+          <path d="M462 786h516v44H462z" fill="#d0a167"/>
+          <path d="M465 475h510v25H465z" fill="#d9b477"/>
+          <path d="M480 470l52-112 52 112zM856 470l52-112 52 112z" fill="#d0a167"/>
+        </g>
+        <g fill="#17343a">
+          <path d="M116 789V542h34v247zM88 555h90l-45-63z"/>
+          <path d="M1285 800V590h29v210zM1262 600h75l-37-54z"/>
+        </g>
+        <path d="M0 837 Q325 794 620 835 T1440 816" fill="none" stroke="#d4aa6e" stroke-width="3" opacity=".4"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="shade" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="#nile" aria-label="Echoes of Egypt, beginning">
+      <span class="brand-mark"><span>𓂀</span></span>
+      Echoes of Egypt
+    </a>
+    <nav aria-label="Chapters">
+      <a href="#nile" class="is-current">The Nile</a>
+      <a href="#pyramids">Monuments</a>
+      <a href="#temple">Writing</a>
+      <a href="#afterlife">Beliefs</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="chapter" id="nile" data-scene="nile">
+      <div class="chapter-copy">
+        <p class="eyebrow">A civilization shaped by water</p>
+        <h1>The gift<br>of the Nile</h1>
+        <p>Each year, the river’s flood left behind rich, dark soil. Along its banks, Egyptian farmers grew the grain that sustained cities, kingdoms, and one of the ancient world’s most enduring civilizations.</p>
+        <span class="chapter-index">01 — Land &amp; life</span>
+        <div class="scroll-cue"><span></span>Continue the journey</div>
+      </div>
+    </section>
+
+    <section class="chapter" id="pyramids" data-scene="pyramids">
+      <div class="chapter-copy">
+        <p class="eyebrow">Stone, skill &amp; ambition</p>
+        <h2>Built for<br>eternity</h2>
+        <p>The pyramids of Giza were royal tombs built during Egypt’s Old Kingdom. Their immense scale reflects generations of planning, skilled labor, and a belief in the pharaoh’s journey beyond this life.</p>
+        <span class="chapter-index">02 — The monuments</span>
+      </div>
+    </section>
+
+    <section class="chapter" id="temple" data-scene="temple">
+      <div class="chapter-copy">
+        <p class="eyebrow">Words made sacred</p>
+        <h2>Stories in<br>stone</h2>
+        <p>Egyptian writing ranged from everyday hieratic script to the formal hieroglyphs carved on temples and tombs. Scribes recorded royal histories, religious rituals, trade, and the rhythms of daily life.</p>
+        <span class="chapter-index">03 — Language &amp; culture</span>
+      </div>
+    </section>
+
+    <section class="chapter" id="afterlife" data-scene="afterlife">
+      <div class="chapter-copy">
+        <p class="eyebrow">Life beyond the horizon</p>
+        <h2>A journey<br>after life</h2>
+        <p>Many ancient Egyptians believed that life continued after death. Elaborate burials, offerings, and funerary texts helped prepare the deceased for a passage through the underworld and into the next world.</p>
+        <span class="chapter-index">04 — Faith &amp; the afterlife</span>
+      </div>
+    </section>
+  </main>
+
+  <div class="corner-note" aria-hidden="true">Scroll to explore · 3100 BCE — 30 BCE</div>
+
+  <script>
+    (() => {
+      const chapters = [...document.querySelectorAll(".chapter")];
+      const worlds = [...document.querySelectorAll(".world")];
+      const links = [...document.querySelectorAll("nav a")];
+
+      function activate(chapter) {
+        const scene = chapter.dataset.scene;
+
+        worlds.forEach(world => {
+          world.classList.toggle("is-active", world.dataset.world === scene);
+        });
+
+        links.forEach(link => {
+          const current = link.getAttribute("href") === "#" + chapter.id;
+          link.classList.toggle("is-current", current);
+
+          if (current) link.setAttribute("aria-current", "location");
+          else link.removeAttribute("aria-current");
+        });
+      }
+
+      const observer = new IntersectionObserver(entries => {
+        const visible = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+
+        if (visible.length) activate(visible[0].target);
+      }, { threshold: [0.25, 0.45, 0.65, 0.8] });
+
+      chapters.forEach(chapter => observer.observe(chapter));
+    })();
+  </script>
+</body>
+</html>
